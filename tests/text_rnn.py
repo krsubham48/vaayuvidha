@@ -1,9 +1,11 @@
 # simple RNN experiment
 # quick tutorial: https://pytorch.org/tutorials/intermediate/char_rnn_generation_tutorial.html
+# difference between LSTM and LSTMCell: https://stackoverflow.com/questions/57048120/pytorch-lstm-vs-lstmcell
 
 import numpy as np
 import torch
 import torch.nn as nn
+from torch.nn import functional as F
 from argparse import ArgumentParser
 
 
@@ -37,27 +39,24 @@ for x in dummy_language[:20]:
 
 
 # --- Making the model --- #
-class RNN(nn.Module):
-    def __init__(self, config):
-        super(RNN, self).__init__()
-        self.hidden_size = config.hidden_size
-        self.i2h = nn.Linear(n_categories + config.input_size +
-                             config.hidden_size, config.hidden_size)
-        self.i2o = nn.Linear(n_categories + config.input_size +
-                             config.hidden_size, config.output_size)
-        self.o2o = nn.Linear(config.hidden_size + config.output_size, config.output_size)
-        self.dropout = nn.Dropout(0.1)
-        self.softmax = nn.LogSoftmax(dim=1)
+class SimpleLSTM(nn.Module):
+    def __init__(self, config) -> None:
+        super().__init__()
+        self.wte = nn.Embedding(config.vocab_size, config.edim)
+        self.lstm = nn.LSTM(config.edim, config.edim)
+        self.lm_head = nn.Linear(config.edim, config.vocab_size)
 
-    def forward(self, category, input, hidden):
-        input_combined = torch.cat((category, input, hidden), 1)
-        hidden = self.i2h(input_combined)
-        output = self.i2o(input_combined)
-        output_combined = torch.cat((hidden, output), 1)
-        output = self.o2o(output_combined)
-        output = self.dropout(output)
-        output = self.softmax(output)
-        return output, hidden
+    def forward(self, sentence):
+        embeds = self.word_embeddings(sentence)
+        lstm_out, _ = self.lstm(embeds.view(len(sentence), 1, -1))
+        head_space = self.lm_head(lstm_out.view(len(sentence), -1))
+        lm_scores = F.log_softmax(head_space, dim=1)
+        return lm_scores
 
-    def initHidden(self):
-        return torch.zeros(1, self.hidden_size)
+# make model and loss fn
+model = SimpleLSTM(args)
+loss_function = nn.NLLLoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
+
+print(model)
+print(dummy_language[0][0])
