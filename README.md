@@ -9,6 +9,7 @@ The repo is aimed as a quick hacky scripts and not a proper project developement
 3. [train.py](train.py): main training file
 4. [config.json](config.json): JSON configuration
 5. [utils.py](utils.py): utility functions and objects used during training
+6. [data/](data/): Data processor and related preprocessing tests
 
 
 ## Literature
