@@ -16,7 +16,7 @@ target: tensor([101,  77,  46,  32,  90,  61,  69,   6,  65,  73,  56,  48,  93,
 output: tensor([ 12,  16,  36,  36,  34,  34,  51,  35,  74,  23,  23, 102, 102, 102, 102, 100, 100, 100, 100])
 ```
 
-1. [`rnn_gen.py`](rnn_gen.py): LSTM used with hidden state to generate dummy sequences
+2. [`rnn_gen.py`](rnn_gen.py): LSTM used with hidden state to generate dummy sequences
 ```
 ➜  vaayuvidha git:(master) ✗ python3 tests/rnn_gen.py
 ----- BEFORE -----
@@ -26,4 +26,25 @@ Epoch: 300/300; loss: 49.135: 100%|███████████████
 ----- AFTER -----
 target: [101  77  46  32  90  61  69   6  65  73  56  48  93  41  18 102 100 100 100]
 output: [ 44  13  18  15  17  45 102 102 102  38 102 102 102 102 102 100 100 100 100]
+```
+
+3. [`test_gnn.py`](test_gnn.py): Simple 1-layer autoencoder like GNN network
+```
+(vaayuvidha) ➜  vaayuvidha git:(master) ✗ python3 tests/test_gnn.py
+GCNConv(
+  (lin): Linear(in_features=4, out_features=32, bias=True)
+  (lin2): Linear(in_features=32, out_features=4, bias=True)
+)
+----- BEFORE -----
+Batch: Batch(batch=[90], edge_index=[2, 788], i0=[90, 1], i1=[90, 1], i2=[90, 1], i3=[90, 1], t0=[90, 1], t1=[90, 1], t2=[90, 1], t3=[90, 1])
+out_shape: torch.Size([90, 4])
+targ_shape: torch.Size([90, 4])
+tensor([0.6977, 0.2161, 0.9763, 0.0062]) tensor([ 0.0017,  0.0949, -0.0846,  0.2044])
+----- LEARNING -----
+Epoch: 50/50; loss: 0.251: 100%|████████████████████████████████████| 50/50 [00:27<00:00,  1.85it/s]
+----- AFTER -----
+Batch: Batch(batch=[90], edge_index=[2, 788], i0=[90, 1], i1=[90, 1], i2=[90, 1], i3=[90, 1], t0=[90, 1], t1=[90, 1], t2=[90, 1], t3=[90, 1])
+out_shape: torch.Size([90, 4])
+targ_shape: torch.Size([90, 4])
+tensor([0.6977, 0.2161, 0.9763, 0.0062]) tensor([0.4981, 0.4922, 0.4844, 0.4842])
 ```
