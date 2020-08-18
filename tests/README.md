@@ -48,3 +48,5 @@ out_shape: torch.Size([90, 4])
 targ_shape: torch.Size([90, 4])
 tensor([0.6977, 0.2161, 0.9763, 0.0062]) tensor([0.4981, 0.4922, 0.4844, 0.4842])
 ```
+
+4. [`test_temporal_gnn.py`](test_temporal_gnn.py): Simple temporal GNN on fixed graph

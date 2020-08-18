@@ -1,7 +1,6 @@
 # simple GNN auto-encoder like model
 # https://pytorch-geometric.readthedocs.io/en/latest/notes/create_gnn.html#implementing-the-gcn-layer
 
-
 import numpy as np
 import torch
 import networkx as nx
@@ -23,7 +22,7 @@ args.add_argument("--num_nodes", type = int, default = 30, help = "number of nod
 args.add_argument("--node_args", type = int, default = 4, help = "number of meta fields to add")
 args.add_argument("--hdim", type=int, default=32, help="hidden dimension")
 args.add_argument("--p", type = float, default = 0.3, help = "probability of connection nodes in sample graphs")
-args.add_argument("--num", type = int, default = 1000, help = "number of samples of dummy language")
+args.add_argument("--num", type = int, default = 1000, help = "number of samples of dataset")
 args.add_argument("--batch_size", type = int, default = 8, help = "batch size for training")
 args.add_argument("--lr", type = float, default = 0.001, help = "batch_size in training")
 args.add_argument("--epochs", type = int, default = 50, help = "number of training epochs")
