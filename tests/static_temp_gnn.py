@@ -1,6 +1,6 @@
 # implementation of tempopral GNN on static graphs
 # the sample data is like the weather data that it is a very long 
-# sequence that si broken up into sub sequences for sample
+# sequence that is broken up into sub sequences for sample
 
 import numpy as np
 import torch
@@ -25,7 +25,7 @@ args.add_argument("--hdim", type=int, default=32, help="hidden dimension")
 args.add_argument("--p", type = float, default = 0.3, help = "probability of connection nodes in sample graphs")
 args.add_argument("--num", type = int, default = 100, help = "number of steps")
 args.add_argument("--maxlen", type = int, default = 10, help = "maximm training length")
-args.add_argument("--batch_size", type = int, default = 1, help = "batch size for training")
+args.add_argument("--batch_size", type = int, default = 32, help = "batch size for training")
 args.add_argument("--lr", type = float, default = 0.001, help = "batch_size in training")
 args.add_argument("--epochs", type = int, default = 50, help = "number of training epochs")
 args = args.parse_args()
@@ -53,17 +53,43 @@ class DataLoader(object):
         self.data = data
         self.batch_size = batch_size
         self.maxlen = maxlen
+        # print(f"%%%%%%%, {self.data}")
 
     def __iter__(self):
-        data = []
+        # return [time_step * batch_size, ... ] seequence and caller at runtime would convert to blocks
+        data = [] # [total_samples, maxlen]
         for i in range(len(self.data) - self.maxlen):
-            data.append(self.data[i:i+self.maxlen])
-        return iter(tgx.data.DataLoader(data, self.batch_size))
+            data.extend(self.data[i:i+self.maxlen])
         
-dl = DataLoader(data_tgx, maxlen = args.maxlen, batch_size=args.batch_size)
+        data = []
+        for i in range(len(self.data) - self.maxlen + 1):
+            data.append(self.data[i:i+self.maxlen])
+        idx = np.arange(len(data)); np.random.shuffle(idx)
+        
+        data_time_batched = []; max_idx = -1
+        for i in range(0, (len(data) // self.batch_size) + int(len(data) % self.batch_size > 0)):
+            samples = [data[idx[i*self.batch_size + j]] for j in range(min(self.batch_size, len(data) - max_idx))]
+            max_idx = (i+1) * self.batch_size
+            data_time_batched.append(samples)
+        return iter(data_time_batched)
 
-for idx, item in enumerate(dl):
+# define the custom dataloader
+dl = DataLoader(data_tgx, maxlen = args.maxlen, batch_size=args.batch_size)
+for idx, flat_seq in enumerate(dl):
     if idx:
         break
-    print(item)
+    output = []
+    print(f"flat_seq: {len(flat_seq)}; flat_seq[0]: {len(flat_seq[0])}; maxlen: {args.maxlen}, batch_size: {args.batch_size}")
+    for t in range(args.maxlen):
+        this_sample = None
+        batch = tgx.data.Batch.from_data_list([seq[t] for seq in flat_seq])
+        print(f"T{t} => {batch}")
 
+        # hidden_state = None
+        # input_this = tgx.utils.Batch([tgx.utils.from_networkx(seq[i]) for seq in flat_seq])
+        # out_graphs, hidden_state = model(torch.from_numpy(input_this), hidden_state)
+        # output.append(out_graphs)
+    
+
+# making that bitch of a model
+class Mdel 
