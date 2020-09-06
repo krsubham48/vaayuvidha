@@ -41,10 +41,10 @@ while len(data) < args.num:
         data.append(tgx.utils.from_networkx(g2))
 
 dataloader = tgx.data.DataLoader(data, args.batch_size)
-# for idx, b in enumerate(dataloader):
-#     if idx:
-#         break
-#     print(b)
+for idx, b in enumerate(dataloader):
+    if idx:
+        break
+    print(b)
 
 # --- Making the model --- #
 class GCNConv(MessagePassing):
